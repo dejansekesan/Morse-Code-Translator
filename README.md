@@ -6,21 +6,26 @@ A simple **Morse Code Translator** with a GUI frontend and a C backend.
 
 ## Getting Started
 
-Run the app with:
-
-```bash
-python3 ./gui.py
-```
-
 You **must** have the following files in the **same directory**:
 
 * `input.txt`
 * `output.txt`
-* `variant.c`
+* `variant.c` 
 * `gui.py`
 
 The easiest way is to **clone the entire repository**.
 
+After that you need to compile `variant.c` (The name of the executable **must** be `variant`)
+
+```bash
+gcc -o variant variant.c
+```
+
+After that just run the app with:
+
+```bash
+python3 ./gui.py
+```
 ---
 
 ## Usage and Syntax
