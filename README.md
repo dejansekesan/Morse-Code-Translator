@@ -29,7 +29,7 @@ Or run the compiled binary from the releases.
   * **č** → `c`
   * **đ** → `dj`
 * Supported punctuation characters (converted to Morse):
-  `! ? > < ( ) . , : ; = + - _ " $ @ /`
+  `! ? ( ) . , : ; = + - _ " $ @ /`
 * Characters not in the dictionary are skipped (no output).
 * Output Morse characters are separated by spaces.
 * Newlines in input text create new lines of Morse output.
