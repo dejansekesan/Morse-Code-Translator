@@ -12,6 +12,7 @@ Run the app with:
 python3 ./app.py
 ```
 Or run the compiled binary from the releases.
+
 ---
 
 ## Usage and Syntax
@@ -95,5 +96,5 @@ He is 26 years old - very unhappy.
 * Open source and easy to modify.
 
 ---
-
+![Morse Code Sample](/Morse-Code/morse.png "Sample Morse Code")
 ![Morse Code Sample](/Morse-Code/OIP.jpg "Sample Morse Code")
