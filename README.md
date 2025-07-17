@@ -1,51 +1,73 @@
 # Morse Code Translator App
 
-A simple **Morse Code Translator** with a GUI frontend and a C backend.
+A simple **Morse Code Translator** with a Python GUI frontend.
 
 ---
 
 ## Getting Started
 
-You **must** have the following files in the **same directory**:
-
-* `input.txt`
-* `output.txt`
-* `variant.c` 
-* `gui.py`
-
-The easiest way is to **clone the entire repository**.
-
-After that you need to compile `variant.c` (The name of the executable **must** be `variant`)
+Run the app with:
 
 ```bash
-gcc -o variant variant.c
+python3 ./app.py
 ```
-
-After that just run the app with:
-
-```bash
-python3 ./gui.py
-```
+Or run the compiled binary from the releases.
 ---
 
 ## Usage and Syntax
 
 ### Text to Morse
 
-* `'-'` (dash) is translated to `-....-` (its Morse equivalent)
-* Spaces between words are translated to `/`
-* A dot `.` is translated to `//`
-* Serbian special letters:
+* Letters, digits, and common punctuation are converted to Morse.
+* Spaces between words are translated to `/` (word separator).
+* Newlines are treated as word separators in audio playback.
+* Serbian special letters are normalized as follows:
 
   * **š** → `s`
   * **ć** → `c`
   * **č** → `c`
   * **đ** → `dj`
-* The following characters are **not converted** and are passed as-is:
-  `" , ? ! ( ) ' ; : #`
-* Any other character **not** a letter (A-Z, a-z) or digit (0-9) will be translated to `?`
+* Supported punctuation characters (converted to Morse):
+  `! ? > < ( ) . , : ; = + - _ " $ @ /`
+* Characters not in the dictionary are skipped (no output).
+* Output Morse characters are separated by spaces.
+* Newlines in input text create new lines of Morse output.
 
-**Example input:**
+---
+
+### Morse to Text
+
+* Morse code characters must be separated by spaces.
+* `/` represents a space (word separator).
+* Newlines are treated as word separators (audio playback pause).
+* Supported Morse codes for punctuation are converted to their characters.
+* Unrecognized Morse sequences convert to an empty string.
+* Serbian special letters must be input as their Morse equivalent of normalized characters (e.g. `s` for `š`).
+* Spaces are allowed in Morse input.
+* Output is the decoded text with normalized Serbian letters.
+
+---
+
+## Audio Playback
+
+* Click **Play** to hear Morse code:
+
+  * In **Text to Morse** mode, the Morse in the output box is played.
+  * In **Morse to Text** mode, the Morse in the input box is played.
+* Newlines and `/` produce word-length pauses.
+* Use the **Volume** slider to adjust beep volume.
+* Use the **Speed** slider (0.1s to 2.0s) to control beep duration (lower = faster).
+* The **Stop** button stops playback immediately.
+
+---
+
+## Controls and Shortcuts
+
+* **Convert** button converts input to output.
+* Radio buttons switch conversion direction and clear both text boxes.
+* In **Morse to Text** mode, input is restricted to dots (`.`), dashes (`-`), slashes (`/`), spaces, and newlines.
+
+## Example Input (Text to Morse)
 
 ```
 Mary wanted to jump with Čika Mile.
@@ -55,58 +77,23 @@ He is 26 years old - very unhappy.
 
 ---
 
-### Morse to Text
-
-* `-....-` translates to `-` (dash)
-* `/` translates to a space (word separator)
-* `//` represents a dot `.`
-* Each Morse character must be separated by a space
-* The following punctuation characters are **not converted** and are printed as-is:
-  `" , ? ! ( ) ' ; : #`
-* Any other unrecognized Morse code is converted to `?`
-
-**Example input:**
+## Example Output (Morse)
 
 ```
-# .... .. / -.. --- / -.-- --- ..- / ( .-- .- -. -. .- ) / . .- - ? !
-```
-
-**Expected output:**
-
-```
-#HI DO YOU (WANNA) EAT ?!
-```
-
----
-
-## How to Write Input
-
-* Use spaces to separate Morse code characters.
-* Punctuation marks should be written normally.
-* Serbian special letters are normalized as above.
-* Unrecognized characters result in `?`.
-
----
-
-## Example Morse Input:
-
-```
--- .- .-. -.-- / .-- .- -. - . -.. / - --- / .--- ..- -- .--. / .-- .. - .... / .. -.- .- / -- .. .-.. . // 
-.- -... .- -. / .- ..- .-.. .. -.-. / -.. . -.-. .-.. .. -. . -.. // / .-- .... .. -.-. .... / .. ... / ..- -. ..-. --- .-. - ..- -. .- - . // 
-.... . / .. ... / ..--- -.... / -.-- . .- .-. ... / --- .-.. -.. / -....- / ...- . .-. -.-- / ..- -. .... .- .--. .--. -.-- // 
+-- .- .-. -.-- / .-- .- -. - . -.. / - --- / .--- ..- -- .--. / .-- .. - .... / -.-. .. -.- .- / -- .. .-.. . .-.-.-
+... .- -... .- -. / ... .- ..- .-.. .. -.-. / -.. . -.-. .-.. .. -. . -.. .-.-.- / .-- .... .. -.-. .... / .. ... / ..- -. ..-. --- .-. - ..- -. .- - . .-.-.-
+.... . / .. ... / ..--- -.... / -.-- . .- .-. ... / --- .-.. -.. / -....- / ...- . .-. -.-- / ..- -. .... .- .--. .--. -.-- .-.-.-
 ```
 
 ---
 
 ## About
 
-* The **core logic is written in C** (`variant.c`) for speed and simplicity (which I might regret).
-* The GUI and user interaction are handled by **Python** (`gui.py`).
-* The Python frontend writes to `input.txt`, invokes the C backend, then reads from `output.txt`.
+* Written entirely in **Python** using **Tkinter** for GUI and **pygame** for audio playback.
+* Handles extended Latin (Serbian) letters by normalization.
+* Plays Morse code audio with dot and dash sounds, word and letter spacing.
+* Open source and easy to modify.
 
 ---
 
-## Morse Code
-
 ![Morse Code Sample](/Morse-Code/OIP.jpg "Sample Morse Code")
-
