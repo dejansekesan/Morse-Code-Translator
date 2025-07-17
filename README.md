@@ -9,7 +9,7 @@ A simple **Morse Code Translator** with a Python GUI frontend.
 Run the app with:
 
 ```bash
-python3 ./app.py
+python3 ./morse.py
 ```
 Or run the compiled binary from the releases.
 
