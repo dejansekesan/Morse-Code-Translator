@@ -36,6 +36,10 @@ speed = 0.5
 gap = 0
 playing = False
 stop_signal = threading.Event()
+is_paused = threading.Event()
+playback_position = 0
+morse_playback_thread = None
+flick = 0
 
 def resource_path(relative_path):
     # Get absolute path to resource, works for dev and PyInstaller
@@ -59,22 +63,89 @@ def play_beep(symbol):
         dash_sound.play()
         time.sleep(0.3 * speed)
 
+def highlight(i):
+
+    if var_mode.get() == "morse_to_text":
+        widget = input_text
+    else:
+        widget = output_text
+   
+    widget.tag_remove("highlight", "1.0", tk.END)
+    pos = f"1.{i}"
+    widget.tag_add("highlight", pos, f"1.{i+1}")
+    widget.tag_config("highlight", background="#ff8800", foreground="black")
+
 def play_morse(morse_code):
-    global playing
+    global playback_position, playing, flick
     playing = True
-    for symbol in morse_code:
+    morse_code = morse_code.strip('\n')
+     
+        # Use a local variable `i` for the loop, initialized from the global position
+    i = playback_position
+ 
+    while i < len(morse_code):
         if stop_signal.is_set():
-            break
-        if symbol in ['.', '-']:
-            play_beep(symbol)
-        elif symbol == ' ':
+                break
+ 
+            # Pause logic
+        if is_paused.is_set():
+                # Enter a waiting loop while paused
+            while is_paused.is_set():
+                time.sleep(0.1)
+                if stop_signal.is_set():
+                    break
+    
+            if stop_signal.is_set():
+                    break
+   
+         # After unpausing, update our loop counter `i` from the global
+            # playback_position, which was set by toggle_pause().
+            i = playback_position
+            continue # Restart the loop to check conditions with the new `i`
+        if flick > 0:
+            playback_position = get_output_cursor_offset()
+            i = playback_position
+            flick = 0
+        
+        char = morse_code[i]
+    
+            # Schedule the highlight to run safely on the main thread
+        root.after(0, highlight, i)
+   
+        if char == '.':
+            play_beep('.')
+        elif char == '-':
+            play_beep('-')
+        elif char == ' ':
             time.sleep(0.3 * speed + gap)
-        elif symbol == '/':
+        elif char == '/':
             time.sleep(0.7 * speed + gap)
-        elif symbol == '\n':
+        elif char == '\n':
             time.sleep(1 * speed + gap * 1.1)
+    
         time.sleep(0.1 * speed)
+            # Update loop counter and global position for the next iteration
+        i += 1
+        playback_position = i
+    
     playing = False
+    playback_position = 0
+        # Safely remove highlight from the main thread when playback finishes
+    root.after(0, lambda: output_text.tag_remove("highlight", "1.0", tk.END))
+    root.after(0, lambda: input_text.tag_remove("highlight", "1.0", tk.END))
+
+def get_output_cursor_offset():
+
+    try:
+        widget = output_text if var_mode.get() == "text_to_morse" else input_text
+        offset = widget.count("1.0", "insert")
+        if isinstance(offset, tuple):
+            return offset[0]
+   
+        return offset
+    except Exception:
+        return 0
+
 
 def convert_text_to_morse(text):
     text = text.upper()
@@ -103,25 +174,50 @@ def run_conversion():
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, convert_morse_to_text(input_val))
 
-def toggle_play():
-    global playing
-    if playing:
+def toggle_pause():
+    global playback_position
+    if not playing:
         return
+    if is_paused.is_set():
+        playback_position = get_output_cursor_offset()
+        is_paused.clear()
+        pause_button.config(text="Pause")
+        play_button.config(text="Play")
+    else:
+        is_paused.set()
+        pause_button.config(text="Resume at Cursor")
+        play_button.config(text="Resume")
+
+def toggle_play():
+    global playback_position, morse_playback_thread, playing
+    is_paused.clear()
     stop_signal.clear()
+    if playing:
+        play_button.config(text="Play")
+        pause_button.config(text="Pause")
+        return
     if var_mode.get() == "text_to_morse":
         source = output_text.get("1.0", tk.END).strip()
-    else:  # morse_to_text mode plays input box content (Morse code)
+    else:
         source = input_text.get("1.0", tk.END).strip()
     if not source:
         return
-    thread = threading.Thread(target=play_morse, args=(source,))
-    thread.start()
+    playback_position = 0
+    morse_playback_thread = threading.Thread(target=play_morse, args=(source,))
+    morse_playback_thread.start()
+    pause_button.config(text="Pause")
 
 
 def stop_play():
-    global playing
+    global playback_position, playing
     stop_signal.set()
+    is_paused.clear()
+    pause_button.config(text="Pause")
+    play_button.config(text="Play")
+    playback_position = 0
     playing = False
+    root.after(0, lambda: output_text.tag_remove("highlight", "1.0", tk.END))
+    root.after(0, lambda: input_text.tag_remove("highlight", "1.0", tk.END))
 
 def update_volume(val):
     global volume
@@ -237,34 +333,38 @@ play_button = tk.Button(controls_frame, text="Play", command=toggle_play,
                         font=font_main, bg="#28a745", fg="white")  # green
 play_button.grid(row=0, column=1, padx=5)
 
+pause_button = tk.Button(controls_frame, text="Pause", command=toggle_pause,
+                        font=font_main, bg="#ffda33", fg="black")  # yellow
+pause_button.grid(row=0, column=2, padx=5)
+
 stop_button = tk.Button(controls_frame, text="Stop", command=stop_play,
                         font=font_main, bg="#dc3545", fg="white")  # red
-stop_button.grid(row=0, column=2, padx=5)
+stop_button.grid(row=0, column=3, padx=5)
 
 volume_label = tk.Label(controls_frame, text="Volume", bg=bg_color, fg=fg_color, font=font_main)
-volume_label.grid(row=0, column=3, padx=(20, 5))
+volume_label.grid(row=0, column=4, padx=(20, 5))
 volume_slider = tk.Scale(controls_frame, from_=0, to=1, resolution=0.01, orient="horizontal",
                          command=update_volume, bg=bg_color, fg=fg_color, font=font_main,
                          troughcolor=input_bg)
 volume_slider.set(volume)
-volume_slider.grid(row=0, column=4, padx=5)
+volume_slider.grid(row=0, column=5, padx=5)
 
 speed_label = tk.Label(controls_frame, text="Speed (s)", bg=bg_color, fg=fg_color, font=font_main)
-speed_label.grid(row=0, column=5, padx=(20, 5))
+speed_label.grid(row=0, column=6, padx=(20, 5))
 speed_slider = tk.Scale(controls_frame, from_=0.1, to=2.0, resolution=0.1, orient="horizontal",
                         command=update_speed, bg=bg_color, fg=fg_color, font=font_main,
                         troughcolor=input_bg)
 speed_slider.set(speed)
-speed_slider.grid(row=0, column=6, padx=5)
+speed_slider.grid(row=0, column=7, padx=5)
 
 
 gap_label = tk.Label(controls_frame, text="Gap (in seconds)", bg=bg_color, fg=fg_color, font=font_main)
-gap_label.grid(row=0, column=7, padx=(20, 5))
+gap_label.grid(row=0, column=8, padx=(20, 5))
 gap_slider = tk.Scale(controls_frame, from_=0, to=3.0, resolution=0.1, orient="horizontal",
                         command=update_gap, bg=bg_color, fg=fg_color, font=font_main,
                         troughcolor=input_bg)
 gap_slider.set(gap)
-gap_slider.grid(row=0, column=8, padx=5)
+gap_slider.grid(row=0, column=9, padx=5)
 
 for widget in [input_text, output_text]:
     widget.bind("<Control-a>", select_all)
