@@ -42,7 +42,6 @@ morse_playback_thread = None
 flick = 0
 
 def resource_path(relative_path):
-    # Get absolute path to resource, works for dev and PyInstaller
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -52,6 +51,10 @@ def resource_path(relative_path):
 
 dot_sound = pygame.mixer.Sound(resource_path("dot.wav"))
 dash_sound = pygame.mixer.Sound(resource_path("dash.wav"))
+
+def on_closing():
+    stop_play()    
+    root.destroy()
 
 def play_beep(symbol):
     if symbol == '.':
@@ -80,16 +83,13 @@ def play_morse(morse_code):
     playing = True
     morse_code = morse_code.strip('\n')
      
-        # Use a local variable `i` for the loop, initialized from the global position
     i = playback_position
  
     while i < len(morse_code):
         if stop_signal.is_set():
                 break
  
-            # Pause logic
         if is_paused.is_set():
-                # Enter a waiting loop while paused
             while is_paused.is_set():
                 time.sleep(0.1)
                 if stop_signal.is_set():
@@ -97,11 +97,9 @@ def play_morse(morse_code):
     
             if stop_signal.is_set():
                     break
-   
-         # After unpausing, update our loop counter `i` from the global
-            # playback_position, which was set by toggle_pause().
+
             i = playback_position
-            continue # Restart the loop to check conditions with the new `i`
+            continue 
         if flick > 0:
             playback_position = get_output_cursor_offset()
             i = playback_position
@@ -109,7 +107,6 @@ def play_morse(morse_code):
         
         char = morse_code[i]
     
-            # Schedule the highlight to run safely on the main thread
         root.after(0, highlight, i)
    
         if char == '.':
@@ -124,13 +121,13 @@ def play_morse(morse_code):
             time.sleep(1 * speed + gap * 1.1)
     
         time.sleep(0.1 * speed)
-            # Update loop counter and global position for the next iteration
+
         i += 1
         playback_position = i
     
     playing = False
     playback_position = 0
-        # Safely remove highlight from the main thread when playback finishes
+
     root.after(0, lambda: output_text.tag_remove("highlight", "1.0", tk.END))
     root.after(0, lambda: input_text.tag_remove("highlight", "1.0", tk.END))
 
@@ -204,6 +201,7 @@ def toggle_play():
         return
     playback_position = 0
     morse_playback_thread = threading.Thread(target=play_morse, args=(source,))
+    morse_playback_thread.daemon = True
     morse_playback_thread.start()
     pause_button.config(text="Pause")
 
@@ -253,7 +251,7 @@ def clear_and_set_mode():
     output_text.delete("1.0", tk.END)
     if var_mode.get() == "morse_to_text":
         def only_morse_input(event):
-            if event.char not in ".-/ /\\n\\r\\t\\b":  # add space ' ' here explicitly
+            if event.char not in ".-/ /\\n\\r\\t\\b": 
                 return "break"
         input_text.bind("<Key>", only_morse_input)
     else:
@@ -263,7 +261,7 @@ def clear_and_set_mode():
 # GUI setup
 root = tk.Tk()
 root.title("Variant - Morse Code Converter")
-root.geometry("900x700")
+root.geometry("1150x700")
 root.configure(bg="#1e1e1e")
 
 font_main = font.Font(family="Consolas", size=12)
@@ -376,4 +374,5 @@ for widget in [input_text, output_text]:
     widget.bind("<Control-V>", custom_paste)
     widget.bind("<Control-x>", lambda e, w=widget: w.event_generate("<<Cut>>"))
 
+root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
