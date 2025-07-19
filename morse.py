@@ -33,6 +33,7 @@ EXTENDED_LATIN_MAP = {
 pygame.mixer.init()
 volume = 0.5
 speed = 0.5
+gap = 0
 playing = False
 stop_signal = threading.Event()
 
@@ -67,11 +68,11 @@ def play_morse(morse_code):
         if symbol in ['.', '-']:
             play_beep(symbol)
         elif symbol == ' ':
-            time.sleep(0.3 * speed)
+            time.sleep(0.3 * speed + gap)
         elif symbol == '/':
-            time.sleep(0.7 * speed)
+            time.sleep(0.7 * speed + gap)
         elif symbol == '\n':
-            time.sleep(1 * speed)
+            time.sleep(1 * speed + gap * 1.1)
         time.sleep(0.1 * speed)
     playing = False
 
@@ -129,6 +130,10 @@ def update_volume(val):
 def update_speed(val):
     global speed
     speed = float(val)
+
+def update_gap(val):
+    global gap
+    gap = float(val)
 
 def select_all(event):
     event.widget.tag_add("sel", "1.0", "end")
@@ -251,6 +256,15 @@ speed_slider = tk.Scale(controls_frame, from_=0.1, to=2.0, resolution=0.1, orien
                         troughcolor=input_bg)
 speed_slider.set(speed)
 speed_slider.grid(row=0, column=6, padx=5)
+
+
+gap_label = tk.Label(controls_frame, text="Gap (in seconds)", bg=bg_color, fg=fg_color, font=font_main)
+gap_label.grid(row=0, column=7, padx=(20, 5))
+gap_slider = tk.Scale(controls_frame, from_=0, to=3.0, resolution=0.1, orient="horizontal",
+                        command=update_gap, bg=bg_color, fg=fg_color, font=font_main,
+                        troughcolor=input_bg)
+gap_slider.set(gap)
+gap_slider.grid(row=0, column=8, padx=5)
 
 for widget in [input_text, output_text]:
     widget.bind("<Control-a>", select_all)
