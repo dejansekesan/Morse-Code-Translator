@@ -1,100 +1,149 @@
-# Morse Code Translator App
+# Variant - Morse Code Converter
+ 
+   A feature-rich Morse code translator built with Python, featuring a clean GUI,
+   real-time conversion, and a unique interactive audio player.
+   
+   ![Morse Code Sample](
+   https://raw.githubusercontent.com/zihajlo/Morse-Code/main/morse.png "Application 
+   Screenshot")
+   
+   ---
+   
+   ## ✨ Features
+   
+   *   **Bidirectional Conversion:** Translate from Text to Morse and Morse to Text in
+   real-time.
+   *   **Interactive Audio Playback:** A unique audio player that allows you to pause,
+      stop, and resume playback from any position using your cursor.
+   *   **Adjustable Audio:** Control the playback speed, inter-character gap, and
+   volume with intuitive sliders.
+   *   **Serbian Latin Support:** Correctly normalizes extended Latin characters (š,
+   đ, č, ć, ž) for accurate conversion.
+   *   **Modern UI:** A clean, themed interface built with Tkinter.
+   *   **Cross-Platform:** Runs on any system with Python. Packaged binaries are also
+   available.
+   *   **Full Keyboard Control:** Includes standard editing shortcuts for a smoot workflow.
+   
+   ---
+  
+   ## 🚀 Getting Started
+   
+   ### Running from Source
+   
+   1.  **Prerequisites:** Ensure you have Python 3 installed.
+   2.  **Install Dependencies:** This project uses `pygame` for audio playback.
+      Install it via pip:
 
-A simple **Morse Code Translator** with a Python GUI frontend.
+      pip install pygame
 
----
 
-## Getting Started
+   3.  **Run the App:**
 
-Run the app with:
+      python3 ./morse.py
 
-```bash
-python3 ./morse.py
+
+   
+   ### Using the Binary
+   Download the compiled binary for your operating system from the **Releases**
+  section on GitHub and run it directly.
+   
+   ---
+  
+   ## 📖 How to Use
+   
+   ### Main Interface
+   1.  **Select Mode:** Use the radio buttons at the top to choose between **Text to
+   Morse** or **Morse to Text**. The text boxes will clear automatically.
+   2.  **Input Text:** Type or paste your text into the "Input" box.
+   3.  **Convert:** Click the **Convert** button to see the translation in the
+   "Output" box.
+   
+   ### Interactive Audio Player
+   The audio player gives you precise control over the playback. It plays the Morse
+      code from the correct text box depending on the selected mode.
+   
+   *   **Play:** Starts playback from the beginning of the text. If playback is
+   already active, it does nothing.
+   *   **Pause / Resume at Cursor:**
+       *   Clicking **Pause** will freeze the playback, and the button's text will
+   change to **"Resume at Cursor"**.
+       *   To resume, move your cursor and click anywhere in the Morse code text.
+       *   Click **"Resume at Cursor"**, and playback will continue from your new
+   cursor position.
+   *   **Stop:** Immediately stops playback and resets the position to the beginning.
+   *   **Sliders:**
+       *   **Volume:** Adjusts the beep volume.
+       *   **Speed:** Controls the duration of dots and dashes (lower is faster).
+       *   **Gap:** Adds extra time between each dot or dash, allowing you to slow
+   down the playback for clarity.
+   
+   ### Keyboard Shortcuts
+   Standard text editing shortcuts are available in both input and output boxes.
+    
+   | Shortcut      | Action         |
+   |---------------|----------------|
+   | `Ctrl + A`    | Select All     |
+   | `Ctrl + C`    | Copy           |
+   | `Ctrl + V`    | Paste          |
+   | `Ctrl + X`    | Cut            |
+   | `Ctrl + Z`    | Undo           |
+   | `Ctrl + Y`    | Redo           |
+   
+   ---
+  
+   ## 📝 Morse Code Syntax Rules
+  
+   ### Text to Morse
+   > When converting from plain text to Morse code:
+   > *   Spaces between words are translated to `/`.
+   > *   Newlines are preserved and create a long pause during audio playback.
+   > *   Serbian special letters are normalized: `š`→`s`, `đ`→`dj`, `č`→`c`, `ć`→`c`,
+      `ž`→`z`.
+   > *   Any character not in the Morse dictionary is skipped (see below pictures).
+  
+   ### Morse to Text
+   > When converting from Morse code to plain text:
+   > *   Morse characters (dots and dashes) for a single letter must not have spaces
+      between them (e.g., `.-` is 'A').
+   > *   Each letter's Morse code must be separated by a single space (e.g., `.... . 
+      .-.. .-.. ---`).
+   > *   A slash (`/`) is used to represent a space between words.
+   
+  ---
+   
+   ## 💡 Example
+   
+   #### Input (Text to Morse)
 ```
-Or run the compiled binary from the releases.
+  Mary wanted to jump with Čika Mile.
+  Šaban Šaulić declined. Which is unfortunate.
+  He is 26 years old - very unhappy.
+```
+  
+  ---
 
----
-
-## Usage and Syntax
-
-### Text to Morse
-
-* Letters, digits, and common punctuation are converted to Morse.
-* Spaces between words are translated to `/` (word separator).
-* Newlines are treated as word separators in audio playback.
-* Serbian special letters are normalized as follows:
-
-  * **š** → `s`
-  * **ć** → `c`
-  * **č** → `c`
-  * **đ** → `dj`
-* Supported punctuation characters (converted to Morse):
-  `! ? ( ) . , : ; = + - _ " $ @ /`
-* Characters not in the dictionary are skipped (no output).
-* Output Morse characters are separated by spaces.
-* Newlines in input text create new lines of Morse output.
-
----
-
-### Morse to Text
-
-* Morse code characters must be separated by spaces.
-* `/` represents a space (word separator).
-* Newlines are treated as word separators (audio playback pause).
-* Supported Morse codes for punctuation are converted to their characters.
-* Unrecognized Morse sequences convert to an empty string.
-* Serbian special letters must be input as their Morse equivalent of normalized characters (e.g. `s` for `š`).
-* Spaces are allowed in Morse input.
-* Output is the decoded text with normalized Serbian letters.
-
----
-
-## Audio Playback
-
-* Click **Play** to hear Morse code:
-
-  * In **Text to Morse** mode, the Morse in the output box is played.
-  * In **Morse to Text** mode, the Morse in the input box is played.
-* Newlines and `/` produce word-length pauses.
-* Use the **Volume** slider to adjust beep volume.
-* Use the **Speed** slider (0.1s to 2.0s) to control beep duration (lower = faster).
-* The **Stop** button stops playback immediately.
-
----
-
-## Controls and Shortcuts
-
-* **Convert** button converts input to output.
-* Radio buttons switch conversion direction and clear both text boxes.
-* In **Morse to Text** mode, input is restricted to dots (`.`), dashes (`-`), slashes (`/`), spaces, and newlines.
-
-## Example Input (Text to Morse)
+  
+  #### Output (Morse)
+```
+  -- .- .-. -.-- / .-- .- -. - . -.. / - --- / .--- ..- -- .--. / .-- .. - .... / -.-. .. -.- .-
+   / -- .. .-.. . .-.-.-
+  ... .- -... .- -. / ... .- ..- .-.. .. -.-. / -.. . -.-. .-.. .. -. . -.. .-.-.- / .-- .... ..
+   -.-. .... / .. ... / ..- -. ..-. --- .-. - ..- -. .- - . .-.-.-
+  .... . / .. ... / ..--- -.... / -.-- . .- .-. ... / --- .-.. -.. / -....- / ...- . .-. -.-- /
+  ..- -. .... .- .--. .--. -.-- .-.-.-
 
 ```
-Mary wanted to jump with Čika Mile.
-Šaban Šaulić declined. Which is unfortunate.
-He is 26 years old - very unhappy.
-```
+  
+ ---
+ 
+ ## 🛠️ About
+ 
+ *   Written entirely in **Python**.
+ *   GUI built with the standard **Tkinter** library.
+ *   Audio playback powered by **pygame**.
+ *   Open source and easy to modify.
 
----
+ ## 📷 Photos
 
-## Example Output (Morse)
-
-```
--- .- .-. -.-- / .-- .- -. - . -.. / - --- / .--- ..- -- .--. / .-- .. - .... / -.-. .. -.- .- / -- .. .-.. . .-.-.-
-... .- -... .- -. / ... .- ..- .-.. .. -.-. / -.. . -.-. .-.. .. -. . -.. .-.-.- / .-- .... .. -.-. .... / .. ... / ..- -. ..-. --- .-. - ..- -. .- - . .-.-.-
-.... . / .. ... / ..--- -.... / -.-- . .- .-. ... / --- .-.. -.. / -....- / ...- . .-. -.-- / ..- -. .... .- .--. .--. -.-- .-.-.-
-```
-
----
-
-## About
-
-* Written entirely in **Python** using **Tkinter** for GUI and **pygame** for audio playback.
-* Handles extended Latin (Serbian) letters by normalization.
-* Plays Morse code audio with dot and dash sounds, word and letter spacing.
-* Open source and easy to modify.
-
----
 ![Morse Code Sample](/Morse-Code/morse.png "Sample Morse Code")
 ![Morse Code Sample](/Morse-Code/OIP.jpg "Sample Morse Code")
