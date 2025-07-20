@@ -3,7 +3,7 @@
    A feature-rich Morse code translator built with Python, featuring a clean GUI,
    real-time conversion, and a unique interactive audio player.
    
-   ![Morse Code Sample](/Morse-Code/morseapp.png "Sample Morse Code")
+   ![Morse Code Sample](/Morse-Code/morseappsample.png "Sample Morse Code")
    
    ---
    
