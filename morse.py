@@ -74,8 +74,17 @@ def highlight(i):
         widget = output_text
    
     widget.tag_remove("highlight", "1.0", tk.END)
-    pos = f"1.{i}"
-    widget.tag_add("highlight", pos, f"1.{i+1}")
+    
+    
+    start_pos = f"1.0 + {i} chars"
+
+    char_to_highlight = widget.get(start_pos)
+
+    if char_to_highlight == '\n':
+        return
+
+    end_pos = f"1.0 + {i + 1} chars"
+    widget.tag_add("highlight", start_pos, end_pos)
     widget.tag_config("highlight", background="#ff8800", foreground="black")
 
 def play_morse(morse_code):
