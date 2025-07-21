@@ -103,8 +103,7 @@
    > When converting from Morse code to plain text:
    > *   Morse characters (dots and dashes) for a single letter must not have spaces
       between them (e.g., `.-` is 'A').
-   > *   Each letter's Morse code must be separated by a single space (e.g., `.... . .-.. .-.. ---`).
-      
+   > *   Each letter's Morse code must be separated by a single space (e.g., `.... . .-.. .-.. ---`).   
    > *   A slash (`/`) is used to represent a space between words.
    
   ---
